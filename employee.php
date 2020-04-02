@@ -3,7 +3,13 @@
   require 'authenticate.php';
   require 'connection.php';
 
-    $query = "SELECT * FROM vehicle ORDER BY ModelID DESC LIMIT 10";
+  $car_sort = 'ModelID';
+
+  if (filter_input(INPUT_POST, 'car_sort', FILTER_SANITIZE_FULL_SPECIAL_CHARS) && isset($_POST['sortcommand'])) {
+  	$car_sort = filter_input(INPUT_POST, 'car_sort', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  }
+
+    $query = "SELECT * FROM vehicle ORDER BY $car_sort DESC LIMIT 10";
     $statement = $db->prepare($query); // Returns a PDOStatement object.
     $statement->execute(); // The query is now executed.
     $cars= $statement->fetchAll();
@@ -55,8 +61,23 @@
       <p>
         <input type="submit" name="command" value="Create" />
       </p>
+    </fieldset>
+  </form>
+  <form action="employee.php" method="post">
+      <p>
+      	<label for="car_sort">Sort By:</label>
+		<select name= "car_sort" id="car_sort">
+		  <option value="Name">Name</option>
+		  <option value="BasePrice">BasePrice</option>
+		  <option value="Type">Type</option>
+		</select>
+      </p>
+      <p>
+        <input type="submit" name="sortcommand" value="Sort" />
+      </p>
       <div id="car_data">
       <h2>Available Cars:</h2>
+      <h4>Sorted by: <?= $car_sort ?></h4>
       	<?php foreach($cars as $car): ?>
       		<div>
       		<h4><a href="edit.php?ModelID=<?=$car['ModelID']?>">Model ID: <?=$car['ModelID']?></a></h4>
@@ -65,7 +86,5 @@
       		</div>
       	<?php endforeach?>
       </div>
-    </fieldset>
-  </form>
 </div>
 </html>
