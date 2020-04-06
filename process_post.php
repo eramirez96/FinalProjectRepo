@@ -7,9 +7,36 @@
 */
   require 'connection.php';
 
+  // file_upload_path() - Safely build a path String that uses slashes appropriate for our OS.
+  // Default upload path is an 'uploads' sub-folder in the current folder.
+  function file_upload_path($original_filename, $upload_subfolder_name = 'uploads') {
+     $current_folder = dirname(__FILE__);
+     
+     // Build an array of paths segment names to be joins using OS specific slashes.
+     $path_segments = [$current_folder, $upload_subfolder_name, basename($original_filename)];
+     
+     // The DIRECTORY_SEPARATOR constant is OS specific.
+     return join(DIRECTORY_SEPARATOR, $path_segments);
+  }
+
+  // file_is_an_image() - Checks the mime-type & extension of the uploaded file for "image-ness".
+  function file_is_an_image($temporary_path, $new_path) {
+      $allowed_mime_types      = ['image/jpeg', 'image/png'];
+      $allowed_file_extensions = ['jpg', 'jpeg', 'png'];
+      
+      $actual_file_extension   = pathinfo($new_path, PATHINFO_EXTENSION);
+      $actual_mime_type        = getimagesize($temporary_path)['mime'];
+      
+      $file_extension_is_valid = in_array($actual_file_extension, $allowed_file_extensions);
+      $mime_type_is_valid      = in_array($actual_mime_type, $allowed_mime_types);
+      
+      return $file_extension_is_valid && $mime_type_is_valid;
+  }
+
   $car_name = filter_input(INPUT_POST, 'car_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $car_type = filter_input(INPUT_POST, 'car_type', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $invalid = false;
+  $no_image = true;
 
   if (!filter_input(INPUT_POST, 'car_price', FILTER_VALIDATE_INT)) {
     $invalid = true;
@@ -22,23 +49,47 @@
   	$invalid = true;
   }
 
+  $image_upload_detected = isset($_FILES['image']) && ($_FILES['image']['error'] === 0);
+
+  if ($image_upload_detected) { 
+    $detected = 'image detected!';
+    $image_filename        = $_FILES['image']['name'];
+    $temporary_image_path  = $_FILES['image']['tmp_name'];
+    $new_image_path        = file_upload_path($image_filename);
+    if (file_is_an_image($temporary_image_path, $new_image_path)) {
+        move_uploaded_file($temporary_image_path, $new_image_path);
+    }
+    $no_image = false;
+  }
+
   if (isset($_POST['command']) && !isset($_POST['ModelID']) && $invalid == false) {
-	$query     = "INSERT INTO vehicle (Name, Type, BasePrice) values (:car_name, :car_type, :car_price)";
+	$query     = "INSERT INTO vehicle (Name, Type, BasePrice, img) values (:car_name, :car_type, :car_price, :image_filename)";
 	$statement = $db->prepare($query);
 	$statement->bindValue(':car_name', $car_name);        
   $statement->bindValue(':car_type', $car_type);
   $statement->bindValue(':car_price', $car_price);
+  $statement->bindValue(':image_filename', $image_filename);
 	$statement->execute();
 
-	header("Location: http://localhost:31337/Final_Project/index.html");
+	header("Location: http://localhost:31337/Final_Project/employee.php");
+    exit;
+  }
+  else if ($no_image && isset($_POST['command']) && !isset($_POST['ModelID']) && $invalid == false) {
+  $query     = "INSERT INTO vehicle (Name, Type, BasePrice) values (:car_name, :car_type, :car_price)";
+  $statement = $db->prepare($query);
+  $statement->bindValue(':car_name', $car_name);        
+  $statement->bindValue(':car_type', $car_type);
+  $statement->bindValue(':car_price', $car_price);
+  $statement->execute();
+
+  header("Location: http://localhost:31337/Final_Project/employee.php");
     exit;
   }
 
+  if ($no_image && isset($_POST['updatecommand'])) {
+    $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
 
-  if (isset($_POST['updatecommand'])) {
-  	$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
-
-  	$query     = "UPDATE vehicle SET Name = :car_name, Type = :car_type, BasePrice = :car_price WHERE ModelID = :id";
+    $query     = "UPDATE vehicle SET Name = :car_name, Type = :car_type, BasePrice = :car_price WHERE ModelID = :id";
     $statement = $db->prepare($query);
     $statement->bindValue(':car_name', $car_name);        
     $statement->bindValue(':car_type', $car_type);
@@ -49,6 +100,22 @@
     header("Location: http://localhost:31337/Final_Project/employee.php");
     exit;
   }
+  else if (isset($_POST['updatecommand'])) {
+    $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
+
+    $query     = "UPDATE vehicle SET Name = :car_name, Type = :car_type, BasePrice = :car_price, img = :image_filename WHERE ModelID = :id";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':car_name', $car_name);        
+    $statement->bindValue(':car_type', $car_type);
+    $statement->bindValue(':car_price', $car_price);
+    $statement->bindValue(':image_filename', $image_filename);
+    $statement->bindValue(':id', $id, PDO::PARAM_INT);
+    $statement->execute();
+
+    header("Location: http://localhost:31337/Final_Project/employee.php");
+    exit;
+  }
+
 
   if (isset($_POST['deletecommand'])) {
   	$id = filter_input(INPUT_POST, 'ModelID', FILTER_SANITIZE_NUMBER_INT);
@@ -59,6 +126,24 @@
     $statement->execute();
 
     header("Location: http://localhost:31337/Final_Project/index.html");
+    exit;
+  }
+
+  if (isset($_POST['deletecommandimage'])) {
+    $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
+
+    $query     = "UPDATE vehicle SET Name = :car_name, Type = :car_type, BasePrice = :car_price, img = NULL WHERE ModelID = :id";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':car_name', $car_name);        
+    $statement->bindValue(':car_type', $car_type);
+    $statement->bindValue(':car_price', $car_price);
+    $statement->bindValue(':id', $id, PDO::PARAM_INT);
+    $statement->execute();
+
+    $del_filename = $_POST['current_image'];
+    unlink('uploads'.DIRECTORY_SEPARATOR.$del_filename);
+
+    header("Location: http://localhost:31337/Final_Project/edit.php?ModelID="."$id");
     exit;
   }
 

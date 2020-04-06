@@ -39,10 +39,11 @@
     </nav>
   </div>
 <div id="all_blogs">
-  <form action="process_post.php" method="post">
+  <form action="process_post.php" method="post" enctype="multipart/form-data">
     <fieldset>
       <legend>Edit Car Information</legend>
       <?php foreach($cars as $car): ?>
+      <p>Model ID: <?=$car['ModelID']?></p>
       <p>
         <label for="car_name">Car Name:</label>
         <input name="car_name" id="car_name" value="<?=$car['Name']?>" />
@@ -60,11 +61,23 @@
         <label for="car_price">Content</label>
         <input name="car_price" id="car_price" value="<?=$car['BasePrice']?>" />
       </p>
+      <p>
+        <label for="image">Upload an Image:</label>
+        <input type='file' name='image' id='image'>
+        <?php if (!empty($car['img'])): ?>
+          <p>Current Image:</p>
+          <img src="uploads/<?= $car['img'] ?>" alt="" />
+         <?php endif ?>
+      </p>
       <?php endforeach ?>
       <p>
         <input type="hidden" name="id" value="<?=$car['ModelID']?>" />
+        <input type="hidden" name="current_image" value="<?=$car['img']?>" />
         <input type="submit" name="updatecommand" value="Update" />
         <input type="submit" name="deletecommand" value="Delete" onclick="return confirm('Are you sure you wish to delete this post?')" />
+        <?php if (!empty($car['img'])): ?>
+        <input type="submit" name="deletecommandimage" value="Delete Image" />
+        <?php endif ?>
       </p>
     </fieldset>
   </form>

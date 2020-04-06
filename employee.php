@@ -9,7 +9,7 @@
   	$car_sort = filter_input(INPUT_POST, 'car_sort', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   }
 
-    $query = "SELECT * FROM vehicle ORDER BY $car_sort DESC LIMIT 10";
+    $query = "SELECT * FROM vehicle ORDER BY $car_sort ASC LIMIT 20";
     $statement = $db->prepare($query); // Returns a PDOStatement object.
     $statement->execute(); // The query is now executed.
     $cars= $statement->fetchAll();
@@ -38,7 +38,7 @@
 		</nav>
 	</div>
 <div id="all_blogs">
-  <form action="process_post.php" method="post">
+  <form action="process_post.php" method="post" enctype="multipart/form-data">
     <fieldset>
       <legend>Create a New Car</legend>
       <p>
@@ -57,6 +57,10 @@
       <p>
         <label for="car_price">Base Price:</label>
         <input name="car_price" id="car_price" />
+      </p>
+      <p>
+      	<label for="image">Upload an Image:</label>
+      	<input type='file' name='image' id='image'>
       </p>
       <p>
         <input type="submit" name="command" value="Create" />
@@ -82,6 +86,10 @@
       		<div>
       		<h4><a href="edit.php?ModelID=<?=$car['ModelID']?>">Model ID: <?=$car['ModelID']?></a></h4>
       		<p>Name: <?=$car['Name']?></p>
+      		<p>Type: <?=$car['Type']?></p>
+      		<?php if (!empty($car['img'])): ?>
+      			<img src="uploads/<?= $car['img'] ?>" alt="" />
+      		<?php endif ?>
       		<p>Starts From: <?=$car['BasePrice']?></p>
       		</div>
       	<?php endforeach?>
