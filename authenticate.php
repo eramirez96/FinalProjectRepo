@@ -1,28 +1,23 @@
- <?php
-/*
-    Assignment 4 PHP and Database
-    Author: Elijah Ramirez
-    Date: February, 10, 2020
-    Purpost: To use user input, storing them into a database and to manipulate them for display.
-*/
-  define('ADMIN_LOGIN','wally');
-
-  define('ADMIN_PASSWORD','mypass');
-
-  if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])
-
-      || ($_SERVER['PHP_AUTH_USER'] != ADMIN_LOGIN)
-
-      || ($_SERVER['PHP_AUTH_PW'] != ADMIN_PASSWORD)) {
-
-    header('HTTP/1.1 401 Unauthorized');
-
-    header('WWW-Authenticate: Basic realm="Our Blog"');
-
-    exit("Access Denied: Username and password required.");
-
-  }
-
-   
-
-?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Electric Motors Inc.</title>
+  <link rel="stylesheet" type="text/css" href="index.css">
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Arimo&display=swap" rel="stylesheet"> 
+</head>
+<body>
+  <h2>Log In</h2>
+  <form action="employee.php" method="post">
+    <p>
+      <label for="uname">Username:</label>
+      <input type='text' name='uname' id='uname'>
+    </p>
+    <p>
+      <label for="pwd">Password:</label>
+      <input type='password' name='pwd' id='pwd'>
+    </p>
+    <input type="submit" name="login" value="Log in" />
+  </form>
+</body>
+</html>

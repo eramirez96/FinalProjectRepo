@@ -57,11 +57,34 @@
     $temporary_image_path  = $_FILES['image']['tmp_name'];
     $new_image_path        = file_upload_path($image_filename);
     if (file_is_an_image($temporary_image_path, $new_image_path)) {
-        move_uploaded_file($temporary_image_path, $new_image_path);
+
+        $current_folder = dirname(__FILE__);
+
+        copy($temporary_image_path, $image_filename);
+
+        //image resizing
+        $ext = explode('.', $image_filename);
+        $ext = end($ext);
+
+        $base_name = explode('.', $image_filename);
+        $base_name = reset($base_name);
+
+        //new images
+        include "uploads/ImageResize.php";
+        include "uploads/ImageResizeException.php";
+
+        $newfile = new \Gumlet\ImageResize($image_filename);
+
+        $newfile->resizeToWidth(300);
+        $newfile->save($base_name .'.'. $ext);
+
+        copy($image_filename, 'uploads/'.$image_filename);
+        unlink($image_filename);
     }
     $no_image = false;
   }
 
+  //Creating a database entry with INSERT
   if (isset($_POST['command']) && !isset($_POST['ModelID']) && $invalid == false) {
 	$query     = "INSERT INTO vehicle (Name, Type, BasePrice, img) values (:car_name, :car_type, :car_price, :image_filename)";
 	$statement = $db->prepare($query);
@@ -86,6 +109,7 @@
     exit;
   }
 
+  //Updating database entry with UPDATE
   if ($no_image && isset($_POST['updatecommand'])) {
     $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
 
@@ -116,9 +140,9 @@
     exit;
   }
 
-
+  //Updating database with DELETE
   if (isset($_POST['deletecommand'])) {
-  	$id = filter_input(INPUT_POST, 'ModelID', FILTER_SANITIZE_NUMBER_INT);
+  	$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
 
     $query = "DELETE FROM vehicle WHERE ModelID = :id";
     $statement = $db->prepare($query);

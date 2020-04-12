@@ -1,6 +1,32 @@
 <?php
 
-  require 'authenticate.php';
+  $uname = 'admin';
+  $pwd = 'admin';
+  session_start();
+
+  $logged_in = false;
+
+  if (isset($_SESSION['uname'])){
+      $logged_in = true;
+  }
+  else { 
+  if (isset($_POST['login'])) {
+    if ($_POST['uname']==$uname && $_POST['pwd']) {
+      $_SESSION['uname'] = $uname;
+      $logged_in = true;
+      echo "<script>alert('Welcome!')</script>";
+    }
+    else {
+    header("refresh:1;url=authenticate.php");
+    echo "<script>alert('Invalid username or password!')</script>";
+    exit;
+    }
+  }
+  else {
+      header("Location: http://localhost:31337/Final_Project/authenticate.php");
+    }   
+  }
+
   require 'connection.php';
 
   $car_sort = 'ModelID';
@@ -34,9 +60,13 @@
 			<li><a href="products.html">PRODUCTS</a></li>
 			<li><a href="contact.html">CONTACT US</a></li>
 			<li><a href="employee.php">EMPLOYEE SITE</a></li>
+      <li><a href="logout.php">LOG OUT</a></li>
 		</ul>
 		</nav>
 	</div>
+  <?php if ($logged_in = true): ?>
+    <p>Logged in!</p>
+  <?php endif ?>
 <div id="all_blogs">
   <form action="process_post.php" method="post" enctype="multipart/form-data">
     <fieldset>
@@ -94,5 +124,7 @@
       		</div>
       	<?php endforeach?>
       </div>
+    </form>
 </div>
+</body>
 </html>
