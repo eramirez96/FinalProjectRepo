@@ -1,33 +1,39 @@
 <?php
 
-  $uname = 'admin';
-  $pwd = 'admin';
+  require 'connection.php';
+
+  //user login check
+  $query = "SELECT * FROM vehicle_user";
+  $statement = $db->prepare($query); // Returns a PDOStatement object.
+  $statement->execute(); // The query is now executed.
+  $usernames= $statement->fetchAll();
+
   session_start();
 
   $logged_in = false;
 
-  if (isset($_SESSION['uname'])){
-      $logged_in = true;
-  }
-  else { 
-  if (isset($_POST['login'])) {
-    if ($_POST['uname']==$uname && $_POST['pwd']) {
-      $_SESSION['uname'] = $uname;
-      $logged_in = true;
-      echo "<script>alert('Welcome!')</script>";
+  foreach ($usernames as $username) {
+    if (isset($_SESSION['uname'])){
+        $logged_in = true;
     }
+    else { 
+      if (isset($_POST['login'])) {
+        if ($_POST['uname']==$username['username'] && $_POST['pwd']==$username['password'] && $username['permission']== 0) {
+          $_SESSION['uname'] = 'set';
+          $logged_in = true;
+          echo "<script>alert('Welcome!')</script>";
+        }
+        else {
+        header("refresh:1;url=authenticate.php");
+        echo "<script>alert('Invalid username or password!')</script>";
+        exit;
+        }
+      }
     else {
-    header("refresh:1;url=authenticate.php");
-    echo "<script>alert('Invalid username or password!')</script>";
-    exit;
+        header("Location: http://localhost:31337/Final_Project/authenticate.php");
+      }   
     }
   }
-  else {
-      header("Location: http://localhost:31337/Final_Project/authenticate.php");
-    }   
-  }
-
-  require 'connection.php';
 
   $car_sort = 'ModelID';
 
@@ -64,6 +70,9 @@
 		</ul>
 		</nav>
 	</div>
+  <form action="user.php">
+  <button type="submit">User Management</button>
+  </form>
   <?php if ($logged_in = true): ?>
     <p>Logged in!</p>
   <?php endif ?>

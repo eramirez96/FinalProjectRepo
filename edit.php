@@ -5,7 +5,6 @@
     Date: February, 10, 2020
     Purpost: To use user input, storing them into a database and to manipulate them for display.
 */
-  require 'authenticate.php';
   require 'connection.php';
 
     $id = $_GET['ModelID'];
@@ -35,6 +34,7 @@
       <li><a href="products.html">PRODUCTS</a></li>
       <li><a href="contact.html">CONTACT US</a></li>
       <li><a href="employee.php">EMPLOYEE SITE</a></li>
+      <li><a href="logout.php">LOG OUT</a></li>
     </ul>
     </nav>
   </div>
@@ -82,9 +82,5 @@
     </fieldset>
   </form>
 </div>
-        <div id="footer">
-            Copywrong 2020 - No Rights Reserved
-        </div> <!-- END div id="footer" -->
-    </div> <!-- END div id="wrapper" -->
 </body>
 </html>

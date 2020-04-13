@@ -171,6 +171,51 @@
     exit;
   }
 
+  //User Insert, Update, and Delete
+  $user_name = filter_input(INPUT_POST, 'user_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $user_password = filter_input(INPUT_POST, 'user_password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $user_type = filter_input(INPUT_POST, 'permission_type', FILTER_SANITIZE_NUMBER_INT);
+
+  //Updating database entry with INSERT
+  if (isset($_POST['usercommand']) && !isset($_POST['UserID'])) {
+    $query     = "INSERT INTO vehicle_user (username, password, permission) values (:user_name, :user_password, :user_type)";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':user_name', $user_name);        
+    $statement->bindValue(':user_password', $user_password);
+    $statement->bindValue(':user_type', $user_type);
+    $statement->execute();
+
+    header("Location: http://localhost:31337/Final_Project/user.php");
+    exit;
+  }
+  //Updating database entry with UPDATE
+  if (isset($_POST['userupdatecommand'])) {
+    $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
+
+    $query     = "UPDATE vehicle_user SET username = :user_name, password = :user_password, permission = :user_type WHERE UserID = :id";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':user_name', $user_name);        
+    $statement->bindValue(':user_password', $user_password);
+    $statement->bindValue(':user_type', $user_type);
+    $statement->bindValue(':id', $id, PDO::PARAM_INT);
+    $statement->execute();
+
+    header("Location: http://localhost:31337/Final_Project/user.php");
+    exit;
+  }
+  //Updating database with DELETE
+  if (isset($_POST['userdeletecommand'])) {
+    $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
+
+    $query = "DELETE FROM vehicle_user WHERE UserID = :id";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':id', $id, PDO::PARAM_INT);
+    $statement->execute();
+
+    header("Location: http://localhost:31337/Final_Project/user.php");
+    exit;
+  }
+
 ?>
 
 <!DOCTYPE html>
