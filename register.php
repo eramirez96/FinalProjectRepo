@@ -28,7 +28,7 @@
     <li><a href="products.php">PRODUCTS</a></li>
 		<li><a href="contact.php">CONTACT US</a></li>
 		<li><a href="employee.php">EMPLOYEE SITE</a></li>
-		<li><a href="register.php">REGISTER</a></li>
+  	<li><a href="register.php">REGISTER</a></li>
     <?php if (isset($_SESSION['uname']) || isset($_SESSION['uname1'])): ?>
       <li><a href="logout.php">LOG OUT</a></li>
     <?php endif ?>
@@ -39,6 +39,10 @@
 <fieldset>
   <legend>Create a New User</legend>
   <p>
+    <label for="user_email">E-mail: </label>
+    <input type="email" name="user_email" id="user_email" />
+  </p>
+  <p>
     <label for="user_name">Username: </label>
     <input name="user_name" id="user_name" />
   </p>
@@ -47,28 +51,14 @@
     <input type="password" name="user_password" id="user_password" />
   </p>
   <p>
-    <label for="permission_type">Permission Type: </label>
-    <select name= "permission_type" id="permission_type">
-      <option value="0">Admin (0)</option>
-      <option value="1">Regular User (1)</option>
-    </select>
+    <label for="confirm_user_password">Confirm Password: </label>
+    <input type="password" name="confirm_user_password" id="confirm_user_password" />
   </p>
   <p>
-    <input type="submit" name="usercommand" value="Create" />
+    <input type="hidden" name="permission_type" value="1" />
+    <input type="submit" name="registerusercommand" value="Create" />
   </p>
 </fieldset>
-</form>
-<h4>Users:</h4>
-<form action="process_post.php" method="post">
-	<?php foreach($usernames as $username): ?>
-		<div>
-		<p>UserID: <?=$username['UserID']?></p>
-		<p>Username: <?=$username['username']?></p>
-		<p>Permission Type: <?=$username['permission']?></p>
-		<h4><a href="edituser.php?UserID=<?=$username['UserID']?>">[EDIT USER]</a></h4>
-		<h3>Date Created: <?=$username['created']?></h3>
-		</div>
-	<?php endforeach?>
 </form>
 </body>
 </html>

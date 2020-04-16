@@ -6,7 +6,9 @@
     Description: Final Project
 
 ----------------->
-
+<?php
+	session_start();
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,10 +24,14 @@
 	<div id="navigation">
 		<nav>
 		<ul>
-			<li><a href="index.html">HOME</a></li>
-			<li><a href="products.html">PRODUCTS</a></li>
-			<li><a href="contact.html">CONTACT US</a></li>
+			<li><a href="index.php">HOME</a></li>
+			<li><a href="products.php">PRODUCTS</a></li>
+			<li><a href="contact.php">CONTACT US</a></li>
 			<li><a href="employee.php">EMPLOYEE SITE</a></li>
+			<li><a href="register.php">REGISTER</a></li>
+			<?php if (isset($_SESSION['uname']) || isset($_SESSION['uname1'])): ?>
+				<li><a href="logout.php">LOG OUT</a></li>
+			<?php endif ?>
 		</ul>
 		</nav>
 	</div>
@@ -47,9 +53,5 @@
 			</dl>
 		</div>
 	</section>
-	<footer>
-	<p id="copyright">Copyright @ 2019 <a href="#">Elijah Ramirez</a></p>
-	<p id="address">160 Princess Street, Winnipeg, MB R3B 1K9</p>
-	</footer>
 </body>
 </html>

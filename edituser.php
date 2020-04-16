@@ -7,6 +7,8 @@
 */
   require 'connection.php';
 
+    session_start();
+
     $id = $_GET['UserID'];
 
     $query = "SELECT * FROM vehicle_user WHERE UserID = {$_GET['UserID']}";
@@ -30,11 +32,14 @@
   <div id="navigation">
     <nav>
     <ul>
-      <li><a href="index.html">HOME</a></li>
-      <li><a href="products.html">PRODUCTS</a></li>
-      <li><a href="contact.html">CONTACT US</a></li>
+      <li><a href="index.php">HOME</a></li>
+      <li><a href="products.php">PRODUCTS</a></li>
+      <li><a href="contact.php">CONTACT US</a></li>
       <li><a href="employee.php">EMPLOYEE SITE</a></li>
-      <li><a href="logout.php">LOG OUT</a></li>
+      <li><a href="register.php">REGISTER</a></li>
+      <?php if (isset($_SESSION['uname']) || isset($_SESSION['uname1'])): ?>
+        <li><a href="logout.php">LOG OUT</a></li>
+      <?php endif ?>
     </ul>
     </nav>
   </div>

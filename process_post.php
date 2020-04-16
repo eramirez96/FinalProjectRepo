@@ -216,6 +216,30 @@
     exit;
   }
 
+  //User Registration
+  //Updating database entry with INSERT
+  $confirm_user_password = filter_input(INPUT_POST, 'confirm_user_password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+  if (isset($_POST['registerusercommand']) && !isset($_POST['UserID'])) {
+    if ($user_password == $confirm_user_password) {
+      $permission_type = filter_input(INPUT_POST, 'permission_type', FILTER_SANITIZE_NUMBER_INT);
+
+      $query     = "INSERT INTO vehicle_user (username, password, permission) values (:user_name, :user_password, :user_type)";
+      $statement = $db->prepare($query);
+      $statement->bindValue(':user_name', $user_name);        
+      $statement->bindValue(':user_password', $user_password);
+      $statement->bindValue(':user_type', $permission_type);
+      $statement->execute();
+
+      header("Location: http://localhost:31337/Final_Project/index.html");
+      exit;
+    }
+    else {
+      header("refresh:1;url=index.html");
+      echo "<script>alert('Passwords are not identical, please try again.')</script>";
+    }
+  }
+
 ?>
 
 <!DOCTYPE html>

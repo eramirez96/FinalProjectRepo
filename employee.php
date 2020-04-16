@@ -14,7 +14,7 @@
 
   foreach ($usernames as $username) {
     if (isset($_SESSION['uname'])){
-        $logged_in = true;
+      $logged_in = true;
     }
     else { 
       if (isset($_POST['login'])) {
@@ -24,15 +24,18 @@
           echo "<script>alert('Welcome!')</script>";
         }
         else {
-        header("refresh:1;url=authenticate.php");
-        echo "<script>alert('Invalid username or password!')</script>";
-        exit;
+        $logged_in = false;
         }
       }
     else {
         header("Location: http://localhost:31337/Final_Project/authenticate.php");
       }   
     }
+  }
+  if (!$logged_in){
+  header("refresh:1;url=authenticate.php");
+  echo "<script>alert('Invalid username or password!')</script>";
+  exit;
   }
 
   $car_sort = 'ModelID';
@@ -62,10 +65,11 @@
 	<div id="navigation">
 		<nav>
 		<ul>
-			<li><a href="index.html">HOME</a></li>
-			<li><a href="products.html">PRODUCTS</a></li>
-			<li><a href="contact.html">CONTACT US</a></li>
+			<li><a href="index.php">HOME</a></li>
+      <li><a href="products.php">PRODUCTS</a></li>
+			<li><a href="contact.php">CONTACT US</a></li>
 			<li><a href="employee.php">EMPLOYEE SITE</a></li>
+      <li><a href="register.php">REGISTER</a></li>
       <li><a href="logout.php">LOG OUT</a></li>
 		</ul>
 		</nav>
@@ -73,7 +77,7 @@
   <form action="user.php">
   <button type="submit">User Management</button>
   </form>
-  <?php if ($logged_in = true): ?>
+  <?php if (isset($_SESSION['uname'])): ?>
     <p>Logged in!</p>
   <?php endif ?>
 <div id="all_blogs">
